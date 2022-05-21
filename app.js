@@ -42,7 +42,13 @@ app.post("/compose", function(req, res) {
   res.redirect("/");
 });
 
-
+app.get("/post/:dayPost", function(req, res) {
+  const target = req.params.dayPost;
+  for (let item in postList) {
+    if(target == postList[item].title)
+      {console.log("Match found!");}
+  };
+});
 
 
 
