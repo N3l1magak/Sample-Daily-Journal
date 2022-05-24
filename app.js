@@ -58,13 +58,9 @@ app.post("/compose", function(req, res) {
 });
 
 app.get("/post/:dayPost", function(req, res) {
-  const target = _.lowerCase(req.params.dayPost);
-  Journal.find(function(err, blogs){
-    blogs.forEach((item, i) => {
-      if(target == _.lowerCase(item.title)) {
-            res.render("post", {curTitle: item.title, curText: item.content});
-        }
-    });
+  const target = req.params.dayPost;
+  Journal.findOne({_id: target}, function(err, blog){
+    res.render("post", {curTitle: blog.title, curText: blog.content});
   });
 });
 
