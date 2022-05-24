@@ -50,8 +50,11 @@ app.post("/compose", function(req, res) {
     title: req.body.postTitle,
     content: req.body.postBody
   });
-  post.save();
-  res.redirect("/");
+  post.save(function(err){
+    if(!err){
+      res.redirect("/");
+    }
+  });
 });
 
 app.get("/post/:dayPost", function(req, res) {
