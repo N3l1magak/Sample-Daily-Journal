@@ -2,6 +2,7 @@
 
 const express = require("express");
 const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
 const ejs = require("ejs");
 const _ = require("lodash");
 
@@ -17,9 +18,19 @@ app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static("public"));
 
+mongoose.connect("mongodb://localhost:27017/DailyJournal");
+
+const journalSchema = {
+  title: String,
+  content: String
+}
+
+const Journal = mongoose.model("journal", journalSchema);
 
 app.get("/", function(req, res) {
-  res.render("home", {hStart: homeStartingContent, posts: postList});
+  Journal.find(function(err,blogs){
+    res.render("home", {hStart: homeStartingContent, posts: blogs});
+  });
 });
 
 app.get("/about", function(req, res) {
@@ -35,22 +46,23 @@ app.get("/compose", function(req, res) {
 });
 
 app.post("/compose", function(req, res) {
-  const post = {
+  const post = new Journal ({
     title: req.body.postTitle,
     content: req.body.postBody
-  };
-  postList.push(post);
+  });
+  post.save();
   res.redirect("/");
 });
 
 app.get("/post/:dayPost", function(req, res) {
   const target = _.lowerCase(req.params.dayPost);
-  for (let item in postList) {
-    if(target == _.lowerCase(postList[item].title)) {
-          res.render("post", {curTitle: postList[item].title, curText: postList[item].content});
-      }
-  };
-
+  Journal.find(function(err, blogs){
+    blogs.forEach((item, i) => {
+      if(target == _.lowerCase(item.title)) {
+            res.render("post", {curTitle: item.title, curText: item.content});
+        }
+    });
+  });
 });
 
 
